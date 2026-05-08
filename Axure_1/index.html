@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>翻页时钟</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: #111;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            overflow: hidden;
+            transition: background-color 0.4s;
+        }
+        body.light { background-color: #e8e8e8; }
+
+        .date-display {
+            width: 760px;
+            text-align: center;
+            font-size: 36px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            color: #ddd;
+            margin-bottom: 32px;
+            transition: color 0.4s;
+        }
+        body.light .date-display { color: #333; }
+
+        .clock-container { display: flex; gap: 8px; }
+
+        .flip-unit {
+            position: relative;
+            width: 120px;
+            height: 180px;
+            border-radius: 12px;
+            font-size: 140px;
+            font-weight: 700;
+            color: #e0e0e0;
+        }
+        body.light .flip-unit { color: #111; }
+
+        /* 静态上下半区 */
+        .half {
+            position: absolute;
+            left: 0; right: 0;
+            height: 90px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+        }
+        .half-top {
+            top: 0;
+            align-items: flex-start;
+            background: linear-gradient(180deg, #2a2a2a, #1e1e1e);
+            border-radius: 12px 12px 0 0;
+        }
+        .half-bottom {
+            bottom: 0;
+            align-items: flex-end;
+            background: linear-gradient(180deg, #1a1a1a, #0d0d0d);
+            border-radius: 0 0 12px 12px;
+        }
+        body.light .half-top    { background: linear-gradient(180deg, #e0e0e0, #d0d0d0); }
+        body.light .half-bottom { background: linear-gradient(180deg, #d0d0d0, #c0c0c0); }
+
+        .half span {
+            display: block;
+            line-height: 180px;
+            height: 180px;
+            color: inherit;
+            user-select: none;
+        }
+
+        /* 中线 */
+        .divider {
+            position: absolute;
+            top: 89px; left: 0; right: 0;
+            height: 2px;
+            background: #000;
+            z-index: 20;
+        }
+        body.light .divider { background: #888; }
+
+        /*
+         * 翻页叶片：覆盖上半或下半，perspective 在父容器
+         * .flip-top-wrap 覆盖上半（top:0），.flip-bot-wrap 覆盖下半（bottom:0）
+         */
+        .flip-top-wrap, .flip-bot-wrap {
+            position: absolute;
+            left: 0; right: 0;
+            height: 90px;
+            perspective: 480px;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .flip-top-wrap { top: 0; }
+        .flip-bot-wrap { bottom: 0; }
+
+        /* 上半叶片：以底边为轴向下翻（0 → -90°） */
+        .leaf-top {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 90px;
+            transform-origin: center bottom;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            background: linear-gradient(180deg, #2a2a2a, #1e1e1e);
+            border-radius: 12px 12px 0 0;
+            display: none;
+        }
+        .leaf-top.go {
+            display: flex;
+            animation: foldDown 0.25s ease-in forwards;
+        }
+        @keyframes foldDown {
+            from { transform: rotateX(0deg); }
+            to   { transform: rotateX(-90deg); }
+        }
+
+        /* 下半叶片：以顶边为轴向上揭开（90° → 0°） */
+        .leaf-bot {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 90px;
+            transform-origin: center top;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            background: linear-gradient(180deg, #1a1a1a, #0d0d0d);
+            border-radius: 0 0 12px 12px;
+            display: none;
+        }
+        .leaf-bot.go {
+            display: flex;
+            animation: unfoldUp 0.25s ease-out forwards;
+        }
+        @keyframes unfoldUp {
+            from { transform: rotateX(90deg); }
+            to   { transform: rotateX(0deg); }
+        }
+
+        body.light .leaf-top { background: linear-gradient(180deg, #e0e0e0, #d0d0d0); }
+        body.light .leaf-bot { background: linear-gradient(180deg, #d0d0d0, #c0c0c0); }
+
+        .leaf-top span, .leaf-bot span {
+            display: block;
+            line-height: 180px;
+            height: 180px;
+            color: inherit;
+            user-select: none;
+        }
+
+        /* AM/PM */
+        .am-pm {
+            position: absolute;
+            top: 12px; left: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #888;
+            letter-spacing: 1px;
+            z-index: 30;
+            transition: color 0.4s;
+        }
+        body.light .am-pm { color: #555; }
+
+        /* 浮动按钮 */
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.1);
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.3s;
+            z-index: 100;
+        }
+        .fab:hover { background: rgba(255,255,255,.2); }
+        body.light .fab { background: rgba(0,0,0,.1); }
+        body.light .fab:hover { background: rgba(0,0,0,.2); }
+        .fab svg { width: 22px; height: 22px; fill: #aaa; transition: fill 0.3s; }
+        body.light .fab svg { fill: #444; }
+        .fab.left { left: 30px; }
+        .fab.right { right: 30px; }
+
+        /* 模态框 */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 32px;
+            min-width: 360px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.8);
+        }
+        body.light .modal { background: #f5f5f5; }
+
+        .modal-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        .modal-tab {
+            flex: 1;
+            padding: 10px;
+            background: rgba(255,255,255,.05);
+            border: none;
+            border-radius: 8px;
+            color: #888;
+            cursor: pointer;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+        .modal-tab.active {
+            background: rgba(255,255,255,.15);
+            color: #e0e0e0;
+        }
+        body.light .modal-tab { background: rgba(0,0,0,.05); }
+        body.light .modal-tab.active { background: rgba(0,0,0,.1); color: #222; }
+
+        .modal-display {
+            font-size: 56px;
+            font-weight: 300;
+            text-align: center;
+            color: #e0e0e0;
+            margin: 24px 0;
+            font-variant-numeric: tabular-nums;
+        }
+        body.light .modal-display { color: #222; }
+
+        .modal-sliders {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .modal-sliders.show { display: flex; }
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .slider-row label {
+            width: 40px;
+            color: #aaa;
+            font-size: 14px;
+        }
+        body.light .slider-row label { color: #666; }
+        .slider-row input[type=range] {
+            flex: 1;
+            height: 4px;
+            background: rgba(255,255,255,.1);
+            border-radius: 2px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        .slider-row input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #e0e0e0;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        body.light .slider-row input[type=range] { background: rgba(0,0,0,.1); }
+        body.light .slider-row input[type=range]::-webkit-slider-thumb { background: #444; }
+        .slider-row .value {
+            width: 32px;
+            text-align: right;
+            color: #e0e0e0;
+            font-size: 14px;
+            font-variant-numeric: tabular-nums;
+        }
+        body.light .slider-row .value { color: #222; }
+
+        .modal-btns {
+            display: flex;
+            gap: 12px;
+        }
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            background: rgba(255,255,255,.1);
+            border: none;
+            border-radius: 8px;
+            color: #e0e0e0;
+            cursor: pointer;
+            font-size: 15px;
+            transition: background 0.2s;
+        }
+        .modal-btn:hover { background: rgba(255,255,255,.15); }
+        body.light .modal-btn { background: rgba(0,0,0,.08); color: #222; }
+        body.light .modal-btn:hover { background: rgba(0,0,0,.12); }
+    </style>
+</head>
+<body>
+    <div class="date-display" id="date-display"></div>
+    <div class="clock-container" id="clock"></div>
+
+    <!-- 主题切换按钮 -->
+    <button class="fab right" id="theme-toggle" title="切换主题">
+        <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>
+    </button>
+
+    <!-- 计时/倒计时按钮 -->
+    <button class="fab left" id="timer-btn" title="计时/倒计时">
+        <svg viewBox="0 0 24 24"><path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42A8.962 8.962 0 0 0 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9a9 9 0 0 0 8.03-13.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
+    </button>
+
+    <!-- 音效开关按钮 -->
+    <button class="fab" style="left:50%;transform:translateX(-50%)" id="sound-btn" title="音效开关">
+        <svg id="sound-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+    </button>
+
+    <!-- 模态框 -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <div class="modal-tabs">
+                <button class="modal-tab active" id="tab-sw">⏱ 计时</button>
+                <button class="modal-tab" id="tab-cd">⏳ 倒计时</button>
+            </div>
+            <div class="modal-display" id="timer-display">00:00:00</div>
+            <div class="modal-sliders" id="cd-sliders">
+                <div class="slider-row">
+                    <label>时</label>
+                    <input type="range" id="sl-h" min="0" max="23" value="0">
+                    <span class="value" id="sl-h-v">00</span>
+                </div>
+                <div class="slider-row">
+                    <label>分</label>
+                    <input type="range" id="sl-m" min="0" max="59" value="0">
+                    <span class="value" id="sl-m-v">00</span>
+                </div>
+                <div class="slider-row">
+                    <label>秒</label>
+                    <input type="range" id="sl-s" min="0" max="59" value="0">
+                    <span class="value" id="sl-s-v">00</span>
+                </div>
+            </div>
+            <div class="modal-btns">
+                <button class="modal-btn" id="btn-start">开始</button>
+                <button class="modal-btn" id="btn-reset">重置</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const DAYS = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+    const SLOT_IDS = ['h1','h2','m1','m2','s1','s2'];
+    const slots = {};
+
+    SLOT_IDS.forEach((id, i) => {
+        const unit = document.createElement('div');
+        unit.className = 'flip-unit';
+        unit.innerHTML = `
+            ${i === 0 ? '<div class="am-pm" id="am-pm">AM</div>' : ''}
+            <div class="half half-top"><span id="${id}-top">0</span></div>
+            <div class="half half-bottom"><span id="${id}-bot">0</span></div>
+            <div class="divider"></div>
+            <div class="flip-top-wrap">
+                <div class="leaf-top" id="${id}-ltop"><span id="${id}-ltop-n">0</span></div>
+            </div>
+            <div class="flip-bot-wrap">
+                <div class="leaf-bot" id="${id}-lbot"><span id="${id}-lbot-n">0</span></div>
+            </div>`;
+        document.getElementById('clock').appendChild(unit);
+        slots[id] = {
+            top:      document.getElementById(`${id}-top`),
+            bot:      document.getElementById(`${id}-bot`),
+            ltop:     document.getElementById(`${id}-ltop`),
+            ltopN:    document.getElementById(`${id}-ltop-n`),
+            lbot:     document.getElementById(`${id}-lbot`),
+            lbotN:    document.getElementById(`${id}-lbot-n`),
+            val: -1
+        };
+    });
+
+    function setSlot(id, newVal) {
+        const s = slots[id];
+        if (s.val === newVal) return;
+        const oldVal = s.val < 0 ? newVal : s.val;
+        s.val = newVal;
+
+        // 静态层：上半=旧，下半=旧
+        s.top.textContent = oldVal;
+        s.bot.textContent = oldVal;
+
+        // 第一段：上半叶片显示旧数字，向下折叠（0→-90°）
+        s.ltopN.textContent = oldVal;
+        s.ltop.classList.remove('go');
+        void s.ltop.offsetWidth;
+        s.ltop.classList.add('go');
+
+        s.ltop.addEventListener('animationend', () => {
+            s.ltop.classList.remove('go');
+
+            // 只更新静态上半，静态下半保持旧数字
+            s.top.textContent = newVal;
+
+            // 下半叶片显示新数字，从90°揭开
+            s.lbotN.textContent = newVal;
+            s.lbot.classList.remove('go');
+            void s.lbot.offsetWidth;
+            s.lbot.classList.add('go');
+
+            s.lbot.addEventListener('animationend', () => {
+                s.lbot.classList.remove('go');
+                // 动画完全结束后才更新静态下半
+                s.bot.textContent = newVal;
+            }, { once: true });
+        }, { once: true });
+    }
+
+    function tick() {
+        const now = new Date();
+        let h = now.getHours();
+        const min = now.getMinutes(), sec = now.getSeconds();
+
+        const y  = now.getFullYear();
+        const mo = String(now.getMonth()+1).padStart(2,'0');
+        const d  = String(now.getDate()).padStart(2,'0');
+        document.getElementById('date-display').textContent =
+            `${y} / ${mo} / ${d}  ${DAYS[now.getDay()]}`;
+
+        document.getElementById('am-pm').textContent = h >= 12 ? 'PM' : 'AM';
+        h = h % 12 || 12;
+
+        setSlot('h1', Math.floor(h   / 10));
+        setSlot('h2', h   % 10);
+        setSlot('m1', Math.floor(min / 10));
+        setSlot('m2', min % 10);
+        setSlot('s1', Math.floor(sec / 10));
+        setSlot('s2', sec % 10);
+    }
+
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        document.body.classList.toggle('light');
+    });
+
+    // ========== 走针音效 ==========
+    let soundOn = false;
+    let tickAudio = null;
+
+    function tick_sound() {
+        if (!soundOn) {
+            // 关闭时立即暂停并重置音频
+            if (tickAudio) {
+                tickAudio.pause();
+                tickAudio.currentTime = 0;
+            }
+            return;
+        }
+        if (!tickAudio) {
+            tickAudio = new Audio('tick.mp3');
+            tickAudio.volume = 0.6;
+        }
+        tickAudio.currentTime = 0;
+        tickAudio.play().catch(() => {});
+    }
+
+    const $soundBtn = document.getElementById('sound-btn');
+    const $soundIcon = document.getElementById('sound-icon');
+    const ICON_ON  = '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>';
+    const ICON_OFF = '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>';
+
+    if ($soundBtn) {
+        $soundBtn.addEventListener('click', () => {
+            console.log('音效按钮被点击，当前状态:', soundOn);
+            soundOn = !soundOn;
+            $soundIcon.innerHTML = soundOn ? ICON_ON : ICON_OFF;
+            // 增强视觉反馈：开启时高亮，关闭时暗淡
+            $soundBtn.style.opacity = soundOn ? '1' : '0.4';
+            $soundBtn.style.background = soundOn ? 'rgba(255,255,255,.2)' : 'rgba(255,255,255,.05)';
+            console.log('切换后状态:', soundOn);
+        });
+        $soundBtn.style.opacity = '0.4';
+        $soundBtn.style.background = 'rgba(255,255,255,.05)';
+    } else {
+        console.error('音效按钮未找到');
+    }
+
+    tick();
+    setInterval(() => { tick(); tick_sound(); }, 1000);
+
+    // ========== 计时器/倒计时 ==========
+    const timer = {
+        mode: 'stopwatch',
+        running: false,
+        elapsed: 0,
+        target: 0,
+        startAt: null,
+        rafId: null
+    };
+
+    const $overlay = document.getElementById('modal-overlay');
+    const $display = document.getElementById('timer-display');
+    const $tabSw = document.getElementById('tab-sw');
+    const $tabCd = document.getElementById('tab-cd');
+    const $sliders = document.getElementById('cd-sliders');
+    const $slH = document.getElementById('sl-h');
+    const $slM = document.getElementById('sl-m');
+    const $slS = document.getElementById('sl-s');
+    const $btnStart = document.getElementById('btn-start');
+    const $btnReset = document.getElementById('btn-reset');
+
+    function fmt(sec) {
+        const h = Math.floor(sec / 3600);
+        const m = Math.floor((sec % 3600) / 60);
+        const s = sec % 60;
+        return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    }
+
+    function render() {
+        $display.textContent = fmt(timer.mode === 'stopwatch' ? timer.elapsed : timer.target);
+    }
+
+    function beep() {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        [0, 0.3, 0.6].forEach(t => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.frequency.value = 880;
+            gain.gain.setValueAtTime(0.3, ctx.currentTime + t);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.2);
+            osc.start(ctx.currentTime + t);
+            osc.stop(ctx.currentTime + t + 0.2);
+        });
+    }
+
+    function loop() {
+        if (!timer.running) return;
+        if (timer.mode === 'stopwatch') {
+            timer.elapsed = Math.min(timer.elapsed + 1, 86399);
+        } else {
+            timer.target = Math.max(timer.target - 1, 0);
+            if (timer.target === 0) {
+                timer.running = false;
+                clearInterval(timer.rafId);
+                $btnStart.textContent = '开始';
+                beep();
+            }
+        }
+        render();
+    }
+
+    function startPause() {
+        if (timer.running) {
+            timer.running = false;
+            clearInterval(timer.rafId);
+            $btnStart.textContent = '继续';
+        } else {
+            if (timer.mode === 'countdown' && timer.target === 0) {
+                timer.target = +$slH.value * 3600 + +$slM.value * 60 + +$slS.value;
+                if (timer.target === 0) return;
+            }
+            timer.running = true;
+            $btnStart.textContent = '暂停';
+            timer.rafId = setInterval(loop, 1000);
+        }
+    }
+
+    function reset() {
+        timer.running = false;
+        clearInterval(timer.rafId);
+        timer.elapsed = 0;
+        timer.target = 0;
+        $btnStart.textContent = '开始';
+        render();
+    }
+
+    function switchTab(mode) {
+        timer.mode = mode;
+        reset();
+        if (mode === 'stopwatch') {
+            $tabSw.classList.add('active');
+            $tabCd.classList.remove('active');
+            $sliders.classList.remove('show');
+        } else {
+            $tabCd.classList.add('active');
+            $tabSw.classList.remove('active');
+            $sliders.classList.add('show');
+        }
+    }
+
+    document.getElementById('timer-btn').addEventListener('click', () => {
+        $overlay.classList.add('show');
+    });
+
+    $overlay.addEventListener('click', (e) => {
+        if (e.target === $overlay) {
+            $overlay.classList.remove('show');
+        }
+    });
+
+    $tabSw.addEventListener('click', () => switchTab('stopwatch'));
+    $tabCd.addEventListener('click', () => switchTab('countdown'));
+    $btnStart.addEventListener('click', startPause);
+    $btnReset.addEventListener('click', reset);
+
+    [$slH, $slM, $slS].forEach(sl => {
+        sl.addEventListener('input', () => {
+            document.getElementById(sl.id + '-v').textContent = String(sl.value).padStart(2,'0');
+            if (!timer.running) {
+                timer.target = +$slH.value * 3600 + +$slM.value * 60 + +$slS.value;
+                render();
+            }
+        });
+    });
+
+    render();
+</script>
+</body>
+</html>

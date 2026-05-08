@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<axure_widget>
+  <widget name="翻页卡片" id="flip_card_widget" type="dynamic-panel">
+    <properties>
+      <width>120</width>
+      <height>180</height>
+      <corner-radius>12</corner-radius>
+      <shadow>0,10,30,rgba(0,0,0,0.5)</shadow>
+    </properties>
+    
+    <children>
+      <widget type="rectangle" name="CardBackground" x="0" y="0" width="120" height="180" fill="#1a1a1a" corner-radius="12"/>
+      
+      <widget type="rectangle" name="TopHalf" x="0" y="0" width="120" height="90">
+        <properties>
+          <fill>gradient</fill>
+          <gradient-start>#2a2a2a</gradient-start>
+          <gradient-end>#1a1a1a</gradient-end>
+          <gradient-direction>vertical</gradient-direction>
+          <corner-radius>12,12,0,0</corner-radius>
+        </properties>
+      </widget>
+      
+      <widget type="rectangle" name="BottomHalf" x="0" y="90" width="120" height="90">
+        <properties>
+          <fill>gradient</fill>
+          <gradient-start>#1a1a1a</gradient-start>
+          <gradient-end>#0d0d0d</gradient-end>
+          <gradient-direction>vertical</gradient-direction>
+          <corner-radius>0,0,12,12</corner-radius>
+        </properties>
+      </widget>
+      
+      <widget type="label" name="TopNumber" x="0" y="-45" width="120" height="180">
+        <properties>
+          <text>0</text>
+          <font-family>Helvetica Neue</font-family>
+          <font-size>140</font-size>
+          <font-weight>bold</font-weight>
+          <color>#e0e0e0</color>
+          <alignment>center</alignment>
+        </properties>
+      </widget>
+      
+      <widget type="label" name="BottomNumber" x="0" y="45" width="120" height="180">
+        <properties>
+          <text>0</text>
+          <font-family>Helvetica Neue</font-family>
+          <font-size>140</font-size>
+          <font-weight>bold</font-weight>
+          <color>#e0e0e0</color>
+          <alignment>center</alignment>
+        </properties>
+      </widget>
+      
+      <widget type="rectangle" name="Separator" x="0" y="89" width="120" height="2">
+        <properties>
+          <fill>#000000</fill>
+          <opacity>0.8</opacity>
+        </properties>
+      </widget>
+      
+      <widget type="rectangle" name="InnerShadow" x="0" y="90" width="120" height="90">
+        <properties>
+          <fill>gradient</fill>
+          <gradient-start>rgba(0,0,0,0.4)</gradient-start>
+          <gradient-end>transparent</gradient-end>
+          <gradient-direction>vertical</gradient-direction>
+          <pointer-events>none</pointer-events>
+        </properties>
+      </widget>
+    </children>
+    
+    <variables>
+      <variable name="displayValue" type="text" default="0"/>
+    </variables>
+    
+    <interactions>
+      <onvariablechange name="displayValue">
+        <action type="settext" widget="TopNumber" value="=[[displayValue]]"/>
+        <action type="settext" widget="BottomNumber" value="=[[displayValue]]"/>
+      </onvariablechange>
+    </interactions>
+  </widget>
+</axure_widget>

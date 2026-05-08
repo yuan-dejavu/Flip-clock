@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<axure_page>
+  <page name="翻页时钟" id="page_flip_clock">
+    <properties>
+      <width>1200</width>
+      <height>800</height>
+      <background-color>#000000</background-color>
+      <scrollable>false</scrollable>
+    </properties>
+    
+    <widgets>
+      <widget type="dynamic-panel" name="ClockContainer" x="120" y="280" width="840" height="180">
+        <widget type="dynamic-panel" name="Hour1Card" x="0" y="0" width="120" height="180">
+          <widget type="rectangle" name="CardBG" x="0" y="0" width="120" height="180" fill="#1a1a1a" corner-radius="12"/>
+          <widget type="rectangle" name="TopBG" x="0" y="0" width="120" height="90" fill-gradient="#2a2a2a,#1a1a1a" corner-radius="12,12,0,0"/>
+          <widget type="rectangle" name="BottomBG" x="0" y="90" width="120" height="90" fill-gradient="#1a1a1a,#0d0d0d" corner-radius="0,0,12,12"/>
+          <widget type="label" name="TopNumber" x="0" y="-45" width="120" height="180" text="1" font="Helvetica Neue,140,bold" color="#e0e0e0" align="center"/>
+          <widget type="label" name="BottomNumber" x="0" y="45" width="120" height="180" text="1" font="Helvetica Neue,140,bold" color="#e0e0e0" align="center"/>
+          <widget type="rectangle" name="Separator" x="0" y="89" width="120" height="2" fill="#000000" opacity="0.8"/>
+          <widget type="label" name="AMPM" x="15" y="15" width="40" height="20" text="AM" font="Helvetica Neue,16,bold" color="#999999"/>
+        </widget>
+        
+        <widget type="dynamic-panel" name="Hour2Card" x="128" y="0" width="120" height="180">
+          <widget type="rectangle" name="CardBG" x="0" y="0" width="120" height="180" fill="#1a1a1a" corner-radius="12"/>
+          <widget type="rectangle" name="TopBG" x="0" y="0" width="120" height="90" fill-gradient="#2a2a2a,#1a1a1a" corner-radius="12,12,0,0"/>
+          <widget type="rectangle" name="BottomBG" x="0" y="90" width="120" height="90" fill-gradient="#1a1a1a,#0d0d0d" corner-radius="0,0,12,12"/>
+          <widget type="label" name="TopNumber" x="0" y="-45" width="120" height="180" text="0" font="Helvetica Neue,140,bold" color="#e0e0e0" align="center"/>
+          <widget type="label" name="BottomNumber" x="0" y="45" width="120" height="180" text="0" font="Helvetica Neue,140,bold" color="#e0e0e0" align="center"/>
+          <widget type="rectangle" name="Separator" x="0" y="89" width="120" height="2" fill="#000000" opacity="0.8"/>
+        </widget>
+        
+        <widget type="dynamic-panel" name="Minute1Card" x="256" y="0" width="120" height="180">
+          <widget type="rectangle" name="CardBG" x="0" y="0" width="120" height="180" fill="#1a1a1a" corner-radius="12"/>
+          <widget type="rectangle" name="TopBG" x="0" y="0" width="120" height="90" fill-gradient="#2a2a2a,#1a1a1a" corner-radius="12,12,0,0"/>
+          <widget type="rectangle" name="BottomBG" x="0" y="90" width="120" height="90" fill-gradient="#1a1a1a,#0d0d0d" corner-radius="0,0,12,12"/>
+          <widget type="label" name="TopNumber" x="0" y="-45" width="120" height="180" text="3" font="Helvetica Neue,140,bold" color="#e0e0e0" align="center"/>
+          <widget type="label" name="BottomNumber" x="0" y="45" width="120" height="180" text="3" font="Helvetica Neue,140,bold" color="#e0e0e0" align="center"/>
+          <widget type="rectangle" name="Separator" x="0" y="89" width="120" height="2" fill="#000000" opacity="0.8"/>
+        </widget>
+        
+        <widget type="dynamic-panel" name="Minute2Card" x="384" y="0" width="120" height="180">
+          <widget type="rectangle" name="CardBG" x="0" y="0" width="120" height="180" fill="#1a1a1a" corner-radius="12"/>
+          <widget type="rectangle" name="TopBG" x="0" y="0" width="120" height="90" fill-gradient="#2a2a2a,#1a1a1a" corner-radius="12,12,0,0"/>
+          <widget type="rectangle" name="BottomBG" x="0" y="90" width="120" height="90" fill-gradient="#1a1a1a,#0d0d0d" corner-radius="0,0,12,12"/>
+          <widget type="label" name="TopNumber" x="0" y="-45" width="120" height="180" text="2" font="Helvetica Neue,140,bold" color="#e0e0e0" align="center"/>
+          <widget type="label" name="BottomNumber" x="0" y="45" width="120" height="180" text="2" font="Helvetica Neue,140,bold" color="#e0e0e0" align="center"/>
+          <widget type="rectangle" name="Separator" x="0" y="89" width="120" height="2" fill="#000000" opacity="0.8"/>
+        </widget>
+        
+        <widget type="dynamic-panel" name="Second1Card" x="512" y="0" width="120" height="180">
+          <widget type="rectangle" name="CardBG" x="0" y="0" width="120" height="180" fill="#1a1a1a" corner-radius="12"/>
+          <widget type="rectangle" name="TopBG" x="0" y="0" width="120" height="90" fill-gradient="#2a2a2a,#1a1a1a" corner-radius="12,12,0,0"/>
+          <widget type="rectangle" name="BottomBG" x="0" y="90" width="120" height="90" fill-gradient="#1a1a1a,#0d0d0d" corner-radius="0,0,12,12"/>
+          <widget type="label" name="TopNumber" x="0" y="-45" width="120" height="180" text="4" font="Helvetica Neue,140,bold" color="#e0e0e0" align="center"/>
+          <widget type="label" name="BottomNumber" x="0" y="45" width="120" height="180" text="4" font="Helvetica Neue,140,bold" color="#e0e0e0" align="center"/>
+          <widget type="rectangle" name="Separator" x="0" y="89" width="120" height="2" fill="#000000" opacity="0.8"/>
+        </widget>
+        
+        <widget type="dynamic-panel" name="Second2Card" x="640" y="0" width="120" height="180">
+          <widget type="rectangle" name="CardBG" x="0" y="0" width="120" height="180" fill="#1a1a1a" corner-radius="12"/>
+          <widget type="rectangle" name="TopBG" x="0" y="0" width="120" height="90" fill-gradient="#2a2a2a,#1a1a1a" corner-radius="12,12,0,0"/>
+          <widget type="rectangle" name="BottomBG" x="0" y="90" width="120" height="90" fill-gradient="#1a1a1a,#0d0d0d" corner-radius="0,0,12,12"/>
+          <widget type="label" name="TopNumber" x="0" y="-45" width="120" height="180" text="4" font="Helvetica Neue,140,bold" color="#e0e0e0" align="center"/>
+          <widget type="label" name="BottomNumber" x="0" y="45" width="120" height="180" text="4" font="Helvetica Neue,140,bold" color="#e0e0e0" align="center"/>
+          <widget type="rectangle" name="Separator" x="0" y="89" width="120" height="2" fill="#000000" opacity="0.8"/>
+        </widget>
+      </widget>
+      
+      <widget type="dynamic-panel" name="SettingsIcon" x="1130" y="730" width="40" height="40">
+        <widget type="ellipse" name="IconBG" x="0" y="0" width="40" height="40" fill="rgba(255,255,255,0.1)" corner-radius="20"/>
+        <widget type="image" name="SettingsSVG" x="10" y="10" width="20" height="20" src="settings.svg"/>
+      </widget>
+    </widgets>
+    
+    <interactions>
+      <onpageload>
+        <action type="setvariable" name="currentHours" value="=Now.GetHours()"/>
+        <action type="setvariable" name="currentMinutes" value="=Now.GetMinutes()"/>
+        <action type="setvariable" name="currentSeconds" value="=Now.GetSeconds()"/>
+        <action type="setvariable" name="period" value="=IF(Now.GetHours()>=12,'PM','AM')"/>
+        <action type="fireevent" event="UpdateTime"/>
+        <action type="settimer" name="TimeTimer" interval="1000" repeat="-1"/>
+      </onpageload>
+      
+      <onevent name="UpdateTime">
+        <action type="setvariable" name="hour1" value="=FLOOR(currentHours/10)"/>
+        <action type="setvariable" name="hour2" value="=currentHours%10"/>
+        <action type="setvariable" name="minute1" value="=FLOOR(currentMinutes/10)"/>
+        <action type="setvariable" name="minute2" value="=currentMinutes%10"/>
+        <action type="setvariable" name="second1" value="=FLOOR(currentSeconds/10)"/>
+        <action type="setvariable" name="second2" value="=currentSeconds%10"/>
+        <action type="settext" widget="TopNumber" value="=[[hour1]]"/>
+        <action type="settext" widget="BottomNumber" value="=[[hour1]]"/>
+        <action type="settext" widget="TopNumber" value="=[[hour2]]"/>
+        <action type="settext" widget="BottomNumber" value="=[[hour2]]"/>
+        <action type="settext" widget="TopNumber" value="=[[minute1]]"/>
+        <action type="settext" widget="BottomNumber" value="=[[minute1]]"/>
+        <action type="settext" widget="TopNumber" value="=[[minute2]]"/>
+        <action type="settext" widget="BottomNumber" value="=[[minute2]]"/>
+        <action type="settext" widget="TopNumber" value="=[[second1]]"/>
+        <action type="settext" widget="BottomNumber" value="=[[second1]]"/>
+        <action type="settext" widget="TopNumber" value="=[[second2]]"/>
+        <action type="settext" widget="BottomNumber" value="=[[second2]]"/>
+        <action type="settext" widget="AMPM" value="=[[period]]"/>
+      </onevent>
+      
+      <ontimer name="TimeTimer">
+        <action type="setvariable" name="currentHours" value="=Now.GetHours()"/>
+        <action type="setvariable" name="currentMinutes" value="=Now.GetMinutes()"/>
+        <action type="setvariable" name="currentSeconds" value="=Now.GetSeconds()"/>
+        <action type="setvariable" name="period" value="=IF(Now.GetHours()>=12,'PM','AM')"/>
+        <action type="fireevent" event="UpdateTime"/>
+      </ontimer>
+    </interactions>
+  </page>
+</axure_page>

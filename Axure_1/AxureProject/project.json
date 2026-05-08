@@ -1,0 +1,21 @@
+{
+  "name": "翻页时钟原型",
+  "description": "一个精美的翻页时钟原型设计",
+  "version": "1.0.0",
+  "author": "Axure Prototype",
+  "createdDate": "2026-04-23",
+  "pages": [
+    {
+      "id": "page1",
+      "name": "翻页时钟",
+      "description": "主页面 - 翻页时钟展示"
+    }
+  ],
+  "widgets": [
+    {
+      "id": "flip-card",
+      "name": "翻页卡片",
+      "description": "单个翻页数字卡片组件"
+    }
+  ]
+}

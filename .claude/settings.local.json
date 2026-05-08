@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(flutter pub *)",
+      "Bash(find \"D:/Turning_page_clock/android/app/src/main/res/mipmap-\"* -type f)",
+      "Bash(python3 -c \"from PIL import Image; print\\('Pillow OK'\\)\")",
+      "Bash(python3 *)"
+    ]
+  }
+}
