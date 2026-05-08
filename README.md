@@ -49,3 +49,5 @@ flutter build apk --release
 - flutter_inappwebview — WebView 容器
 - HTML / CSS / JavaScript — 时钟 UI 与动画
 - Web Audio API — 音效合成
+
+#### 如果有其他需求想让我继续开发，欢迎各位给我发邮件提需求与意见，我会认真分析需求，完成需求，共同进步，完善产品
